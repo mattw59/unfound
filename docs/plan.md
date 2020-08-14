@@ -1,3 +1,5 @@
+- [ ] create a README
+- [ ] initial brainstorming and task outline for development
 - [X] add in Webpack to produce a basic development-time artifact
     - [X] single index.html
     - [X] single javascript file
