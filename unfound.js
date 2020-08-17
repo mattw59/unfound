@@ -4,52 +4,73 @@ import { initPointer, getPointer } from 'kontra';
 
 let { canvas } = init();
 initPointer();
+let count = 0;
 
-class Hexagon extends GameObject.class {
+class Hexagon extends Sprite.class {
   constructor(properties) {
     super(properties);
     this.size = properties.size;
   }
 
-  draw() {
-
+  render() {
     this.context.fillStyle = this.color;
     this.context.strokeStyle = this.color;
     this.context.lineWidth = 1;
     this.context.beginPath();
     this.context.moveTo(this.x + this.size * Math.cos(0), this.y + this.size * Math.sin(0));
-    console.log(`start: x: ${this.x + + this.size * Math.cos(0)}, y: ${this.y + this.size * Math.sin(0)}`);
-    // let lineToX = this.x + this.size * Math.cos(2 * Math.PI / 6);
-    // let lineToY = this.y + this.size * Math.sin(2 * Math.PI / 6);
-    // this.context.lineTo(lineToX, lineToY);
     let i;
     for(i = 1; i <= 6; i++) {
       let lineToX = this.x + this.size * Math.cos(i * 2 * Math.PI / 6);
       let lineToY = this.y + this.size * Math.sin(i * 2 * Math.PI / 6);
-      console.log(`i: ${i}, x: ${lineToX}, y: ${lineToY}`);
       this.context.lineTo(lineToX, lineToY);
     }
     this.context.stroke();
   }
 }
 
-let tile = new Hexagon({
-  x: 100,        // starting x,y position of the sprite
-  y: 100,//Math.sin(30 * Math.PI / 180) * 40,
-  size: 40,
-  color: 'red',  // fill color of the sprite rectangle
-  // width: 20,     // width and height of the sprite rectangle
-  // height: 40//,
-  // dx: 2          // move the sprite 2px to the right every frame
-});
+let tiles = [];
+let i, j;
+for(i = 1; i < 10; i++) {
+  for(j = 1; j < 10; j++) {
+    if(i % 3 === 1 && j % 3 === 1) {
+      // console.log(`processing hex at ${i}, ${j}`);
+      let tile = new Hexagon({
+        x: 40 * i,        // starting x,y position of the sprite
+        y: Math.sin(60 * Math.PI / 180) * 40 * j,
+        size: 40,
+        color: 'red',  // fill color of the sprite rectangle
+        // width: 20,     // width and height of the sprite rectangle
+        // height: 40//,
+        // dx: 2          // move the sprite 2px to the right every frame
+      });
+      tiles.push(tile);
+    }
+    // else if(j % 3 == 2) {
+    //   let tile = new Hexagon({
+    //     x: 40 * i * 2.5,        // starting x,y position of the sprite
+    //     y: Math.sin(60 * Math.PI / 180) * 40 * j,
+    //     size: 40,
+    //     color: 'red',  // fill color of the sprite rectangle
+    //     // width: 20,     // width and height of the sprite rectangle
+    //     // height: 40//,
+    //     // dx: 2          // move the sprite 2px to the right every frame
+    //   });
+    //   tiles.push(tile);
+    // }
+  }
+}
+
 
 let loop = GameLoop({  // create the main game loop
   fps: 1,
   update: function() { // update the game state
-    tile.update();
+    for(const tile of tiles) tile.update();
   },
   render: function() { // render the game state
-    tile.render();
+    for(const tile of tiles) {
+      
+      tile.render();
+    }
   }
 });
 
