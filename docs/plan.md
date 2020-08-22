@@ -1,5 +1,4 @@
 - [ ] create a README
-- [ ] initial brainstorming and task outline for development
 - [ ] make the game full screen in Chrome
 - [ ] create a zip for production build
     - [ ] fail if size > 13kb
@@ -11,6 +10,7 @@
 - [ ] add the ability to zoom in and out
 - [ ] include a missions list on the bottom right corner
 - [ ] make the viewport in 16 X 9 ratio, 1000px wide
+- [X] initial brainstorming and task outline for development
 - [X] add in Webpack to produce a basic development-time artifact
     - [X] single index.html
     - [X] single javascript file
