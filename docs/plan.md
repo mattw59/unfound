@@ -8,6 +8,7 @@
 - [ ] display a stats window on top right corner
 - [ ] add the ability to pan left/right/up/down
 - [ ] add the ability to zoom in and out
+- [ ] if not zoom a minimap
 - [ ] include a missions list on the bottom right corner
 - [ ] make the viewport in 16 X 9 ratio, 1000px wide
 - [X] initial brainstorming and task outline for development
