@@ -1,7 +1,7 @@
 import { init, initPointer, getPointer, Sprite, GameLoop, GameObject, onPointerDown, track } from 'kontra';
 import { BlockTile } from './tile';
 import { Transition } from './transition';
- 
+
 init();
 initPointer();
 
@@ -9,8 +9,8 @@ const localStorage = window.localStorage;
 
 let tiles = [];
 let i, j;
-for (i = 0; i < 4; i++) {
-  for(j = 0; j < 4; j++) {
+for (i = 0; i < 100; i++) {
+  for (j = 0; j < 100; j++) {
     let tile = lightlyWooded({
       x: i * 50,
       y: j * 50,
@@ -24,7 +24,6 @@ for (i = 0; i < 4; i++) {
 }
 
 let loop = GameLoop({  // create the main game loop
-  fps: 1,
   update: function () { // update the game state
     for (const tile of tiles) tile.update();
   },
@@ -36,16 +35,16 @@ let loop = GameLoop({  // create the main game loop
 
 function lightlyWooded(properties) {
   return new BlockTile({
-      x: properties.x,
-      y: properties.y,
-      width: properties.width,
-      height: properties.height,
-      fillStyle: '#3A8C63',
-      nextTransition: new Transition({
-          runTimeMs: 5000,
-          resourcesGathered: 3,
-          nextState: cleared(properties)
-      }) 
+    x: properties.x,
+    y: properties.y,
+    width: properties.width,
+    height: properties.height,
+    fillStyle: '#3A8C63',
+    nextTransition: new Transition({
+      runTimeMs: 30000,
+      resourcesGathered: 3,
+      nextState: cleared(properties)
+    })
   });
 }
 
@@ -57,10 +56,10 @@ function cleared(properties) {
     height: properties.height,
     fillStyle: '#1CF689',
     nextTransition: new Transition({
-        runTimeMs: 5000,
-        start: new Date(),
-        resourcesGathered: 3,
-        nextState: null
+      runTimeMs: 5000,
+      start: new Date(),
+      resourcesGathered: 3,
+      nextState: null
     })
   });
 }

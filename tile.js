@@ -10,6 +10,7 @@ export class BlockTile extends Sprite.class {
         this.currentTransition = null;
         this.fillStyle = properties.fillStyle;
         this.nextState = properties.nextState;
+        this.toUpdate = false;
     }
 
     render() {
@@ -22,13 +23,20 @@ export class BlockTile extends Sprite.class {
     }
 
     update() {
-        if(this.currentTransition) {
+        if (this.toUpdate) {
             let now = new Date();
             let elapsed = now.getTime() - this.currentTransition.start.getTime();
-            console.log(elapsed);
-            if(elapsed >= this.currentTransition.runTimeMs) {
+            if (elapsed >= this.currentTransition.runTimeMs) {
                 this.fillStyle = this.currentTransition.nextState.fillStyle;
                 this.currentTransition = null;
+                this.toRender = true;
+                this.toUpdate = false;
+            }
+            else {
+                let gradient = this.context.createLinearGradient(this.x, this.y, this.x + 50, this.y + 50);
+                gradient.addColorStop(0, '#3A8C63');
+                gradient.addColorStop(1, '#1CF689');
+                this.fillStyle = gradient;
             }
         }
     }
@@ -36,5 +44,6 @@ export class BlockTile extends Sprite.class {
     onDown() {
         this.currentTransition = this.nextTransition;
         this.currentTransition.start = new Date();
+        this.toUpdate = true;
     }
 }
