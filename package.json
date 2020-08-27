@@ -1,6 +1,6 @@
 {
   "name": "unfound",
-  "version": "1.0.0",
+  "https://www.coronavirus.in.gov/files/20_Return%20to%20School_8-25-20.pdfversion": "1.0.0",
   "description": "A post-apocalyptic city-building game for JS13k 2020",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "kontra": "^7.0.0",
+    "static-server": "^2.2.1",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   }

@@ -13,6 +13,7 @@ export class BlockTile extends Sprite.class {
     }
 
     render() {
+        this.context.beginPath();
         this.context.fillStyle = this.fillStyle;
         this.context.strokeStyle = this.strokeStyle;
         this.context.rect(this.x, this.y, this.width, this.height);
