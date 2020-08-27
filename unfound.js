@@ -5,10 +5,12 @@ import { Transition } from './transition';
 init();
 initPointer();
 
+const localStorage = window.localStorage;
+
 let tiles = [];
 let i, j;
-for (i = 0; i < 1; i++) {
-  for(j = 0; j < 1; j++) {
+for (i = 0; i < 4; i++) {
+  for(j = 0; j < 4; j++) {
     let tile = lightlyWooded({
       x: i * 50,
       y: j * 50,
@@ -16,10 +18,10 @@ for (i = 0; i < 1; i++) {
       height: 50
     });
     track(tile);
-    tiles.push(tile);  
+    tiles.push(tile);
+
   }
 }
-
 
 let loop = GameLoop({  // create the main game loop
   fps: 1,
@@ -27,10 +29,7 @@ let loop = GameLoop({  // create the main game loop
     for (const tile of tiles) tile.update();
   },
   render: function () { // render the game state
-    for (const tile of tiles) {
-
-      tile.render();
-    }
+    for (const tile of tiles) tile.render();
   }
 });
 
@@ -43,7 +42,7 @@ function lightlyWooded(properties) {
       height: properties.height,
       fillStyle: '#3A8C63',
       nextTransition: new Transition({
-          runTimeMs: 60000,
+          runTimeMs: 5000,
           resourcesGathered: 3,
           nextState: cleared(properties)
       }) 
@@ -58,7 +57,7 @@ function cleared(properties) {
     height: properties.height,
     fillStyle: '#1CF689',
     nextTransition: new Transition({
-        runTimeMs: 60000,
+        runTimeMs: 5000,
         start: new Date(),
         resourcesGathered: 3,
         nextState: null

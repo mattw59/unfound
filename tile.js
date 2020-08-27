@@ -21,8 +21,6 @@ export class BlockTile extends Sprite.class {
     }
 
     update() {
-        console.log(this.currentTransition);
-        
         if(this.currentTransition) {
             let now = new Date();
             let elapsed = now.getTime() - this.currentTransition.start.getTime();
@@ -35,7 +33,6 @@ export class BlockTile extends Sprite.class {
     }
 
     onDown() {
-        console.log(`clicked the square at ${this.x}, ${this.y}`);
         this.currentTransition = this.nextTransition;
         this.currentTransition.start = new Date();
     }
