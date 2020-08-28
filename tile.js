@@ -1,5 +1,6 @@
 import { Sprite } from 'kontra';
 import { Transition } from './transition';
+import { tileStates } from './tile-states';
 export class BlockTile extends Sprite.class {
 
     constructor(properties) {
@@ -9,8 +10,8 @@ export class BlockTile extends Sprite.class {
         this.nextTransition = properties.nextTransition;
         this.currentTransition = null;
         this.fillStyle = properties.fillStyle;
-        this.nextState = properties.nextState;
         this.toUpdate = false;
+        this.transitionMessage = null;
     }
 
     render() {
@@ -26,11 +27,13 @@ export class BlockTile extends Sprite.class {
         if (this.toUpdate) {
             let now = new Date();
             let elapsed = now.getTime() - this.currentTransition.start.getTime();
+            this.transitionMessage = `square at ${this.x},${this.y} is processing for ${this.currentTransition.runTimeMs - elapsed} more ms`;
             if (elapsed >= this.currentTransition.runTimeMs) {
-                this.fillStyle = this.currentTransition.nextState.fillStyle;
+                this.fillStyle = tileStates.get(this.currentTransition.nextState).fillStyle;
                 this.currentTransition = null;
                 this.toRender = true;
                 this.toUpdate = false;
+                this.transitionMessage = null;
             }
             else {
                 let gradient = this.context.createLinearGradient(this.x, this.y, this.x + 50, this.y + 50);
