@@ -9,16 +9,14 @@ let tiles = [];
 let messages = [];
 
 let i, j;
-for (i = 0; i < 100; i++) {
-  for (j = 0; j < 100; j++) {
+for (i = 0; i < 5; i++) {
+  for (j = 0; j < 5; j++) {
     let tile = new BlockTile({
       x: i * 50,
       y: j * 50,
       width: 50,
       height: 50,
-      fillStyle: tileStates.get('lightlyWooded').fillStyle,
-      nextTransition: tileStates.get('lightlyWooded').nextTransition,
-      resource: tileStates.get('lightlyWooded').resource
+      state: 'lightlyWooded'
     });
     track(tile);
     tiles.push(tile);
@@ -26,15 +24,20 @@ for (i = 0; i < 100; i++) {
 }
 
 let loop = GameLoop({
+  fps: 1,
   update: function () {
-    messages = [];
+    let statuses = document.getElementById('statuses');
+    while (statuses.lastElementChild) {
+      statuses.removeChild(statuses.lastElementChild);
+    }
     for (const tile of tiles) {
       tile.update();
       if (tile.transitionMessage) {
-        messages.push(tile.transitionMessage);
+        let status = document.createElement('li');
+        status.textContent = tile.transitionMessage;
+        statuses.appendChild(status);
       }
     }
-    document.getElementById("message").innerHTML = messages; // TODO put messages in local storage
     document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
   },
   render: function () {

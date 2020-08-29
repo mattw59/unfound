@@ -2,8 +2,18 @@ canvas {
    border: 1px solid #000000;
 }
 
+header {
+   padding-bottom: 10px;
+}
+
+.empty {
+   grid-area: empty;
+}
+
 .main-head {
    grid-area: header;
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr 1fr
 }
 
 .game {
@@ -12,6 +22,8 @@ canvas {
 
 .missions {
    grid-area: missions;
+   display: grid;
+   grid-template-rows: 1fr 1fr;
 }
 
 .wrapper {
@@ -19,7 +31,7 @@ canvas {
    
    grid-template-columns: 1fr 3fr;
    grid-template-areas: 
-      "header  header"
+      "empty  header"
       "missions game"
 }
 
@@ -27,4 +39,12 @@ div {
    font-family: 'Trebuchet MS';
    font-weight: normal;
    font-style: normal;
+}
+
+ul {
+   padding: 0;
+}
+
+li {
+   list-style: none;
 }

@@ -2,17 +2,26 @@ import { Sprite } from 'kontra';
 import { tileStates } from './tile-states';
 export class BlockTile extends Sprite.class {
 
+    takeState(state) {
+        let stateToTake = tileStates.get(state);
+
+        console.log(stateToTake);
+
+        this.fillStyle = stateToTake.fillStyle,
+        this.resource = stateToTake.resource,
+        this.ticksToRun = stateToTake.ticksToRun;
+        this.resourceChange = stateToTake.resourceChange;
+        this.nextState = stateToTake.nextState;
+        this.initialStyle = stateToTake.fillStyle;
+    }
+
     constructor(properties) {
         super(properties);
         this.strokeStyle = '1px black';
         this.state = properties.state;
-        this.nextTransition = properties.nextTransition;
-        this.currentTransition = null;
-        this.fillStyle = properties.fillStyle;
-        this.initialStyle = properties.fillStyle;
         this.toUpdate = false;
-        this.resource = properties.resource;
-        this.transitionMessage = null;
+        this.transitionMessage = properties.transitionMessage;
+        this.takeState(this.state);
     }
 
     render() {
@@ -26,27 +35,20 @@ export class BlockTile extends Sprite.class {
 
     update() {
         if (this.toUpdate) {
-            let now = new Date();
-            let elapsed = now.getTime() - this.currentTransition.start.getTime();
-            this.transitionMessage = `square at ${this.x},${this.y} is processing for ${this.currentTransition.runTimeMs - elapsed} more ms`;
-            let nextStyle = tileStates.get(this.currentTransition.nextState).fillStyle;
-            if (elapsed >= this.currentTransition.runTimeMs) {
-                this.fillStyle = nextStyle;
-                this.toRender = true;
+            this.ticksToRun = this.ticksToRun - 1;
+            this.transitionMessage = `square at ${this.x},${this.y} is processing for ${this.ticksToRun} more s`;
+            if (this.ticksToRun === 0) {
+                let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
+                resourceCount = resourceCount + this.resourceChange;
+                window.localStorage.setItem(this.resource, `${resourceCount}`);
+                this.takeState(this.nextState);
                 this.toUpdate = false;
                 this.transitionMessage = null;
-                this.nextTransition = tileStates.get(this.currentTransition.nextState).nextTransition;
-                
-                let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
-                resourceCount = resourceCount + this.currentTransition.resourceChange;
-                window.localStorage.setItem(this.resource, `${resourceCount}`);
-
-                this.currentTransition = null;
             }
             else {
                 let gradient = this.context.createLinearGradient(this.x, this.y, this.x + 50, this.y + 50);
                 gradient.addColorStop(0, this.initialStyle);
-                gradient.addColorStop(1, nextStyle);
+                gradient.addColorStop(1, tileStates.get(this.nextState).fillStyle);
                 this.fillStyle = gradient;
             }
         }
@@ -54,9 +56,7 @@ export class BlockTile extends Sprite.class {
 
     onDown() {
         let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
-        if((resourceCount + this.nextTransition.resourceChange) >= 0) {
-            this.currentTransition = this.nextTransition;
-            this.currentTransition.start = new Date();
+        if((resourceCount + this.resourceChange) >= 0) {
             this.toUpdate = true;   
         }
         else alert('insufficient resources');
