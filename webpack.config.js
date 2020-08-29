@@ -10,9 +10,7 @@ var config = {
 }
 
 module.exports = (env, argv) => {
-  if(argv.mode == 'production') {
-    config.plugins = [new CompressionPlugin()];
-  }
+  if(argv.mode == 'production') {}
   if(argv.mode == 'development') {
     watch = true;
     devtool = 'inline-source-map';

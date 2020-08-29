@@ -13,17 +13,12 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [ ] keep the game state in local storage so we can refresh the game upon logging back in
 - [ ] display a stats summary across the top of the screen
 - [ ] include a missions list in a left-side menu
-- [ ] create a zip for production build
-    - [ ] fail if size > 13kb
-    - [ ] confirm what all is to be packed into the zip and how the judges will handle it
-- [X] minify or tree-shake with WebPack
 - [ ] during a transition, overlay tile with a counting down pie graph
 - [ ] add the ability to pan left/right/up/down
 - [ ] add the ability to zoom in and out
 - [ ] if not zoom a minimap
 - [ ] queue up actions
 - [ ] allow queued actions to be canceled
-- [ ] switch to TypeScript
 
 - [X] initial brainstorming and task outline for development
 - [X] add in Webpack to produce a basic development-time artifact
@@ -38,3 +33,7 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [X] create a README
 - [X] introduce transition costs, i.e. a cabin takes 5 lumber
 - [X] make the viewport in 16 X 9 ratio, around 1000px wide
+- [X] create a zip for production build
+    - [X] fail if size > 13kb
+    - [X] confirm what all is to be packed into the zip and how the judges will handle it
+- [X] minify or tree-shake with WebPack

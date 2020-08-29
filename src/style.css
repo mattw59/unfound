@@ -1,0 +1,30 @@
+canvas {
+   border: 1px solid #000000;
+}
+
+.main-head {
+   grid-area: header;
+}
+
+.game {
+   grid-area: game;
+}
+
+.missions {
+   grid-area: missions;
+}
+
+.wrapper {
+   display: grid;
+   
+   grid-template-columns: 1fr 3fr;
+   grid-template-areas: 
+      "header  header"
+      "missions game"
+}
+
+div {
+   font-family: 'Trebuchet MS';
+   font-weight: normal;
+   font-style: normal;
+}

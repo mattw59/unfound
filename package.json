@@ -4,9 +4,10 @@
   "description": "A post-apocalyptic city-building game for JS13k 2020",
   "main": "index.js",
   "scripts": {
+    "clean": "rm dist/* ; cp src/index.html dist/index.html ; cp src/style.css dist/style.css",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=development",
-    "prod": "webpack --mode=production"
+    "build": "npm run clean ; webpack --mode=development",
+    "prod": "npm run clean ; webpack --mode=production ; tar -zcvf dist/unfound.tar.gz dist/ ; ls -l dist/unfound.tar.gz"
   },
   "author": "matt@mattwhite.co",
   "license": "ISC",
