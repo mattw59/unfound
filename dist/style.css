@@ -22,3 +22,9 @@ canvas {
       "header  header"
       "missions game"
 }
+
+div {
+   font-family: 'Trebuchet MS';
+   font-weight: normal;
+   font-style: normal;
+}

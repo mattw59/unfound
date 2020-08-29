@@ -1,5 +1,4 @@
 import { Sprite } from 'kontra';
-import { Transition } from './transition';
 import { tileStates } from './tile-states';
 export class BlockTile extends Sprite.class {
 
@@ -39,9 +38,9 @@ export class BlockTile extends Sprite.class {
                 this.nextTransition = tileStates.get(this.currentTransition.nextState).nextTransition;
                 
                 let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
-                resourceCount = resourceCount + this.currentTransition.resourcesGathered;
+                resourceCount = resourceCount + this.currentTransition.resourceChange;
                 window.localStorage.setItem(this.resource, `${resourceCount}`);
-                
+
                 this.currentTransition = null;
             }
             else {
@@ -54,8 +53,12 @@ export class BlockTile extends Sprite.class {
     }
 
     onDown() {
-        this.currentTransition = this.nextTransition;
-        this.currentTransition.start = new Date();
-        this.toUpdate = true;
+        let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
+        if((resourceCount + this.nextTransition.resourceChange) >= 0) {
+            this.currentTransition = this.nextTransition;
+            this.currentTransition.start = new Date();
+            this.toUpdate = true;   
+        }
+        else alert('insufficient resources');
     }
 }

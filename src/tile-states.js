@@ -9,6 +9,7 @@ tileStates.set('lightlyWooded', {
 });
 tileStates.set('cleared', {
     fillStyle: '#1CF689',
+    resource: 'lumber',
     nextTransition: transitions.get('toCabin')
 });
 tileStates.set('cabin', {
