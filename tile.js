@@ -10,7 +10,9 @@ export class BlockTile extends Sprite.class {
         this.nextTransition = properties.nextTransition;
         this.currentTransition = null;
         this.fillStyle = properties.fillStyle;
+        this.initialStyle = properties.fillStyle;
         this.toUpdate = false;
+        this.resource = properties.resource;
         this.transitionMessage = null;
     }
 
@@ -28,17 +30,24 @@ export class BlockTile extends Sprite.class {
             let now = new Date();
             let elapsed = now.getTime() - this.currentTransition.start.getTime();
             this.transitionMessage = `square at ${this.x},${this.y} is processing for ${this.currentTransition.runTimeMs - elapsed} more ms`;
+            let nextStyle = tileStates.get(this.currentTransition.nextState).fillStyle;
             if (elapsed >= this.currentTransition.runTimeMs) {
-                this.fillStyle = tileStates.get(this.currentTransition.nextState).fillStyle;
-                this.currentTransition = null;
+                this.fillStyle = nextStyle;
                 this.toRender = true;
                 this.toUpdate = false;
                 this.transitionMessage = null;
+                this.nextTransition = tileStates.get(this.currentTransition.nextState).nextTransition;
+                
+                let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
+                resourceCount = resourceCount + this.currentTransition.resourcesGathered;
+                window.localStorage.setItem(this.resource, `${resourceCount}`);
+                
+                this.currentTransition = null;
             }
             else {
                 let gradient = this.context.createLinearGradient(this.x, this.y, this.x + 50, this.y + 50);
-                gradient.addColorStop(0, '#3A8C63');
-                gradient.addColorStop(1, '#1CF689');
+                gradient.addColorStop(0, this.initialStyle);
+                gradient.addColorStop(1, nextStyle);
                 this.fillStyle = gradient;
             }
         }

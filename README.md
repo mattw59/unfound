@@ -6,11 +6,13 @@ I'm using the README to act as a simplified backlog. This allows me to try out s
 
 In a larger scale codebase, I most likely would document work to be done using other means, such as Gherkin feature files or test code. In this codebase, I'm adding to the Github-flavored Markdown list below as I think of things, and marking them as complete when they are done.
 
+- [ ] limit the number of active transitions by the number of workers
+- [ ] introduce transition costs, i.e. a cabin takes 5 lumber
 - [ ] Define the allowable tile states in a JSON array
 - [ ] Define the game's beginning state in a JSON array, which is copied into local storage on first load
 - [ ] Define allowable transitions in a JSON array
 - [ ] keep the game state in local storage so we can refresh the game upon logging back in
-- [ ] make the viewport in 16 X 9 ratio, around 1000px wide
+- [X] make the viewport in 16 X 9 ratio, around 1000px wide
 - [ ] display a stats summary across the top of the screen
 - [ ] include a missions list in a left-side menu
 - [ ] create a zip for production build
@@ -20,6 +22,8 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [ ] add the ability to pan left/right/up/down
 - [ ] add the ability to zoom in and out
 - [ ] if not zoom a minimap
+- [ ] queue up actions
+- [ ] allow queued actions to be canceled
 
 - [X] initial brainstorming and task outline for development
 - [X] add in Webpack to produce a basic development-time artifact

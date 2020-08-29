@@ -1,13 +1,9 @@
-import { init, initPointer, getPointer, Sprite, GameLoop, GameObject, onPointerDown, track } from 'kontra';
+import { init, initPointer, GameLoop, track } from 'kontra';
 import { BlockTile } from './tile';
-import { Transition } from './transition';
 import { tileStates } from './tile-states';
 
 init();
 initPointer();
-
-const localStorage = window.localStorage;
-localStorage.setItem("message", "message here");
 
 let tiles = [];
 let messages = [];
@@ -21,60 +17,29 @@ for (i = 0; i < 100; i++) {
       width: 50,
       height: 50,
       fillStyle: tileStates.get('lightlyWooded').fillStyle,
-      nextTransition: tileStates.get('lightlyWooded').nextTransition
+      nextTransition: tileStates.get('lightlyWooded').nextTransition,
+      resource: tileStates.get('lightlyWooded').resource
     });
     track(tile);
     tiles.push(tile);
   }
 }
 
-let loop = GameLoop({  // create the main game loop
-  update: function () { // update the game state
+let loop = GameLoop({
+  update: function () {
     messages = [];
     for (const tile of tiles) {
       tile.update();
       if (tile.transitionMessage) {
         messages.push(tile.transitionMessage);
-        window.localStorage.setItem("message", tile.transitionMessage);
       }
     }
-    document.getElementById("message").innerHTML = messages;
+    document.getElementById("message").innerHTML = messages; // TODO put messages in local storage
+    document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
   },
-  render: function () { // render the game state
+  render: function () {
     for (const tile of tiles) tile.render();
   }
 });
 
-
-function lightlyWooded(properties) {
-  return new BlockTile({
-    x: properties.x,
-    y: properties.y,
-    width: properties.width,
-    height: properties.height,
-    fillStyle: '#3A8C63',
-    nextTransition: new Transition({
-      runTimeMs: 30000,
-      resourcesGathered: 3,
-      nextState: cleared(properties)
-    })
-  });
-}
-
-function cleared(properties) {
-  return new BlockTile({
-    x: properties.x,
-    y: properties.y,
-    width: properties.width,
-    height: properties.height,
-    fillStyle: '#1CF689',
-    nextTransition: new Transition({
-      runTimeMs: 5000,
-      start: new Date(),
-      resourcesGathered: 3,
-      nextState: null
-    })
-  });
-}
-
-loop.start();    // start the game
+loop.start();
