@@ -12,7 +12,8 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"dbaeumer.vscode-eslint",
-		"github.vscode-pull-request-github"
+		"github.vscode-pull-request-github",
+		"auchenberg.vscode-browser-preview"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

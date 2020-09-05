@@ -1,19 +1,12 @@
 const path = require('path');
-const CompressionPlugin = require('compression-webpack-plugin');
 
-var config = {
+module.exports = {
   entry: './src/unfound.js',
+  watch: true,
+  mode: 'development',
+  devtool: 'inline-source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'unfound.js'
   }
-}
-
-module.exports = (env, argv) => {
-  if(argv.mode == 'production') {}
-  if(argv.mode == 'development') {
-    watch = true;
-    devtool = 'inline-source-map';
-  }
-  return config;
 };

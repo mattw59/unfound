@@ -3,29 +3,7 @@ import { GameLoop, Sprite, init, initPointer, track } from 'kontra';
 init();
 initPointer();
 
-let tileStates = new Map();
-
-tileStates.set('lightlyWooded', {
-    fillStyle: '#3A8C63',
-    resource: 'lumber',
-    ticksToRun: 10,
-    resourceChange: 3,
-    nextState: 'cleared',
-    transitionAction: 'clearing wood',
-    state: 'lightlyWooded'
-});
-tileStates.set('cleared', {
-    fillStyle: '#1CF689',
-    resource: 'lumber',
-    ticksToRun: 10,
-    resourceChange: -5,
-    nextState: 'cabin',
-    state: 'cleared'
-});
-tileStates.set('cabin', {
-    fillStyle: 'brown',
-    state: 'cabin'
-});
+let tileStates = getTileStates();
 
 class BlockTile extends Sprite.class {
 
@@ -51,7 +29,7 @@ class BlockTile extends Sprite.class {
 
     render() {
         switch (this.state) {
-            case 'lightlyWooded':
+            case 'lw':
                 this.context.beginPath();
                 this.context.strokeStyle = this.strokeStyle;
                 this.context.rect(this.x, this.y, this.width, this.height);
@@ -79,9 +57,9 @@ class BlockTile extends Sprite.class {
                 this.context.beginPath();
                 this.context.strokeStyle = this.strokeStyle;
                 this.context.fillStyle = 'white';
-                this.context.moveTo(this.width / 2, 0);
-                this.context.lineTo(this.width, 10);
-                this.context.lineTo(0, 10);
+                this.context.moveTo(this.x + this.width / 2, this.y);
+                this.context.lineTo(this.x + this.width, this.y + 10);
+                this.context.lineTo(this.x, this.y + 10);
                 this.context.closePath();
                 this.context.stroke();
                 break;
@@ -135,29 +113,41 @@ class BlockTile extends Sprite.class {
 }
 
 let tiles = [];
-let messages = [];
-let totalWorkers = 4;
 let activeWorkers = 0;
 let idleWorkers = 4;
-
-let i, j;
-for (i = 0; i < 5; i++) {
-    for (j = 0; j < 5; j++) {
-        let tile = new BlockTile({
-            x: i * 50,
-            y: j * 50,
-            width: 50,
-            height: 50,
-            state: 'lightlyWooded'
-        });
-        track(tile);
-        tiles.push(tile);
-    }
+let initialStates;
+if(localStorage.getItem("unfound")) {
+    initialStates = JSON.parse(localStorage.getItem("unfound"));
+}
+else {
+    initialStates = [
+        {x: 0, y: 0, state: 'lw'},
+        {x: 0, y: 1, state: 'lw'},
+        {x: 0, y: 2, state: 'lw'},
+        {x: 0, y: 3, state: 'lw'},
+        {x: 0, y: 4, state: 'lw'},
+        {x: 0, y: 5, state: 'lw'},
+        {x: 0, y: 6, state: 'lw'},
+        {x: 0, y: 7, state: 'lw'},
+    ];
 }
 
+for(const tileDef of initialStates ) {
+    let tile = new BlockTile({
+        x: tileDef.x * 50,
+        y: tileDef.y * 50,
+        width: 50,
+        height: 50,
+        state: tileDef.state
+    });
+    track(tile);
+    tiles.push(tile);
+}
+let stateToStore = [];
 let loop = GameLoop({
     fps: 1,
     update: function () {
+        stateToStore = [];
         const messages = document.getElementsByClassName('transitionMessage');
         for (const message of messages) {
             message.remove();
@@ -170,7 +160,9 @@ let loop = GameLoop({
                 status.textContent = tile.transitionMessage;
                 statuses.appendChild(status);
             }
+            stateToStore.push({x: tile.x / 50, y: tile.y / 50, state: tile.state});
         }
+        localStorage.setItem("unfound",JSON.stringify(stateToStore));
     },
     render: function () {
         document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
@@ -181,3 +173,30 @@ let loop = GameLoop({
 });
 
 loop.start();
+
+function getTileStates() {
+    let tileStates = new Map();
+
+    tileStates.set('lw', {
+        fillStyle: '#3A8C63',
+        resource: 'lumber',
+        ticksToRun: 10,
+        resourceChange: 3,
+        nextState: 'cleared',
+        transitionAction: 'clearing wood',
+        state: 'lw'
+    });
+    tileStates.set('cleared', {
+        fillStyle: '#1CF689',
+        resource: 'lumber',
+        ticksToRun: 10,
+        resourceChange: -5,
+        nextState: 'cabin',
+        state: 'cleared'
+    });
+    tileStates.set('cabin', {
+        fillStyle: 'brown',
+        state: 'cabin'
+    });
+    return tileStates;
+}
