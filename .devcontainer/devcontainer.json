@@ -13,7 +13,8 @@
 	"extensions": [
 		"dbaeumer.vscode-eslint",
 		"github.vscode-pull-request-github",
-		"auchenberg.vscode-browser-preview"
+		"auchenberg.vscode-browser-preview",
+		"msjsdiag.debugger-for-chrome"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

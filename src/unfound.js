@@ -1,7 +1,12 @@
-import { GameLoop, Sprite, init, initPointer, track } from 'kontra';
+import { GameLoop, Sprite, init, initPointer, track, emit, on } from 'kontra';
 
 init();
 initPointer();
+
+let url = window.location.href;
+
+if(url.indexOf('clear') != -1)
+    localStorage.clear();
 
 let tileStates = getTileStates();
 
@@ -31,37 +36,52 @@ class BlockTile extends Sprite.class {
         switch (this.state) {
             case 'lw':
                 this.context.beginPath();
-                this.context.strokeStyle = this.strokeStyle;
-                this.context.rect(this.x, this.y, this.width, this.height);
-                this.context.stroke();
-                this.context.beginPath();
                 this.context.fillStyle = 'brown';
-                this.context.rect(this.x + 20, this.y + 30, 10, 20);
-                this.context.fill();
-                this.context.stroke();
+                this.context.fillRect(this.x+22, this.y+26, 6, 24);
+
                 this.context.beginPath();
                 this.context.fillStyle = 'green';
-                this.context.arc(this.x + this.width / 2, this.y + this.height / 2, .3 * this.width, 0, 2 * Math.PI);
+                this.context.ellipse(this.x+25, this.y+20, 20, 13, 0,  0, 2*Math.PI);
                 this.context.fill();
-                this.context.stroke();
                 break;
             case 'cleared':
                 this.context.beginPath();
                 this.context.strokeStyle = this.strokeStyle;
-                this.context.fillStyle = this.fillStyle;
+                this.context.fillStyle = 'white';
                 this.context.rect(this.x, this.y, this.width, this.height);
-                this.context.stroke();
                 this.context.fill();
                 break;
             case 'cabin':
                 this.context.beginPath();
                 this.context.strokeStyle = this.strokeStyle;
-                this.context.fillStyle = 'white';
-                this.context.moveTo(this.x + this.width / 2, this.y);
-                this.context.lineTo(this.x + this.width, this.y + 10);
-                this.context.lineTo(this.x, this.y + 10);
+                this.context.fillStyle = 'brown'
+                this.context.moveTo(this.x + this.width / 2, this.y + 1);
+                this.context.lineTo(this.x + this.width - 1, this.y + 20);
+                this.context.lineTo(this.x + 1, this.y + 20);
                 this.context.closePath();
                 this.context.stroke();
+  
+                this.context.beginPath();
+                this.context.moveTo(this.x + 5, this.y + this.height);
+                this.context.lineTo(this.x + 5, this.y + 20);
+                this.context.stroke();
+
+                this.context.beginPath();
+                this.context.moveTo(this.x + this.width - 5, 20);
+                this.context.lineTo(this.x +  + this.width - 5, this.height);
+                this.context.stroke();
+
+                this.context.beginPath();
+                this.context.moveTo(this.x + 1, this.y + this.height);
+                this.context.lineTo(this.x + this.width - 1, this.y + this.height);
+                this.context.stroke();
+
+                this.context.beginPath();
+                this.context.moveTo(this.x + 20, this.y + 50);
+                this.context.lineTo(this.x + 20, this.y + 30);
+                this.context.lineTo(this.x + 30, this.y + 30);
+                this.context.lineTo(this.x + 30, this.y + 50);
+                this.context.fill();
                 break;
             default:
                 break;
@@ -71,7 +91,7 @@ class BlockTile extends Sprite.class {
     update() {
         if (this.toUpdate) {
             this.ticksToRun = this.ticksToRun - 1;
-            this.transitionMessage = `${this.transitionAction} for ${this.ticksToRun} more s`;
+            this.transitionMessage = `1 worker ${this.transitionAction} for ${this.ticksToRun} s`;
             if (this.ticksToRun === 0) {
                 let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
                 if (resourceCount)
@@ -94,25 +114,51 @@ class BlockTile extends Sprite.class {
     }
 
     onDown() {
-        if(idleWorkers > 0) {
-            let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
-            if (resourceCount && (resourceCount + this.resourceChange) >= 0) {
-                activeWorkers = activeWorkers + 1;
-                idleWorkers = idleWorkers - 1;
-                this.toUpdate = true;
-            }
-            else if (!resourceCount) {
-                activeWorkers = activeWorkers + 1;
-                idleWorkers = idleWorkers - 1;
-                this.toUpdate = true;
-            }
-            else alert('insufficient resources');
-        }
-        else alert('no available workers');
+        if(this.nextState instanceof Array)
+            emit('choose', this.x, this.y);
+        else
+            emit('transition', this.x, this.y);
+        // // TODO handle the case where there are multiple transition choices
+        // if(this.nextState instanceof Array) {
+        //     document.getElementById('pick-build').style.visibility = '';
+        // }
     }
 }
 
-let tiles = [];
+on('choose', choose);
+on('transition', transition);
+
+function choose(x, y) {
+    console.log(`choosing for ${x}, ${y}`);
+    const tile = tiles.get(`${x},${y}`);
+    console.log(tile.nextState);
+}
+
+function transition(x, y) {
+    console.log(`transitioning ${x}, ${y}`);
+    const tile = tiles.get(`${x},${y}`);
+    console.log(tile);
+    if(tile.toUpdate) {
+        alert('action already in process');
+    }
+    else if(idleWorkers > 0) {
+        let resourceCount = Number.parseInt(window.localStorage.getItem(tile.resource), 10);
+        if (resourceCount && (resourceCount + tile.resourceChange) >= 0) {
+            activeWorkers = activeWorkers + 1;
+            idleWorkers = idleWorkers - 1;
+            tile.toUpdate = true;
+        }
+        else if (!resourceCount) {
+            activeWorkers = activeWorkers + 1;
+            idleWorkers = idleWorkers - 1;
+            tile.toUpdate = true;
+        }
+        else alert('insufficient resources');
+    }
+    else alert('no available workers');
+}
+
+let tiles = new Map();
 let activeWorkers = 0;
 let idleWorkers = 4;
 let initialStates;
@@ -141,7 +187,7 @@ for(const tileDef of initialStates ) {
         state: tileDef.state
     });
     track(tile);
-    tiles.push(tile);
+    tiles.set(`${tile.x},${tile.y}`, tile);
 }
 let stateToStore = [];
 let loop = GameLoop({
@@ -152,7 +198,7 @@ let loop = GameLoop({
         for (const message of messages) {
             message.remove();
         }
-        for (const tile of tiles) {
+        tiles.forEach(tile => {
             tile.update();
             if (tile.transitionMessage) {
                 let status = document.createElement('li');
@@ -161,14 +207,14 @@ let loop = GameLoop({
                 statuses.appendChild(status);
             }
             stateToStore.push({x: tile.x / 50, y: tile.y / 50, state: tile.state});
-        }
+        })
         localStorage.setItem("unfound",JSON.stringify(stateToStore));
     },
     render: function () {
         document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
         document.getElementById('idle').innerHTML = idleWorkers;
 
-        for (const tile of tiles) tile.render();
+        tiles.forEach(tile => tile.render());
     }
 });
 
@@ -189,9 +235,9 @@ function getTileStates() {
     tileStates.set('cleared', {
         fillStyle: '#1CF689',
         resource: 'lumber',
-        ticksToRun: 10,
-        resourceChange: -5,
-        nextState: 'cabin',
+        ticksToRun: [10, 20],
+        resourceChange: [-5, -10],
+        nextState: ['cabin','farm'],
         state: 'cleared'
     });
     tileStates.set('cabin', {

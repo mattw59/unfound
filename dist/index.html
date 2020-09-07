@@ -6,25 +6,27 @@
 
 <body>
     <div class="wrapper">
-        <header class="main-head">
-            <div><span id="lumber"></span> lumber</div>
-            <div><span id="food"></span> food</div>
-            <div><span id="coin"></span> coin</div>
-        </header>
         <canvas class="game" width="700" height="400"></canvas>
         <script src="./unfound.js"></script>
         <div class="missions">
             <div>
-                <ul id="missions">
-                    <li>mission 1</li>
-                    <li>mission 2</li>
-                    <li>mission 3</li>
+                <ul id="statuses">
+                    <li><span id="lumber"></span> lumber</li>
+                    <li><span id="food"></span> food</li>
+                    <li><span id="coin"></span> coin</li>
+                    <li><span id="idle"></span> idle workers</li>
                 </ul>
             </div>
-            <div>
-                <ul id="statuses">
-                    <li id="idleLine"><span id="idle"></span> idle</li>
-                </ul>
+            <div id='pick-build' style="visibility: hidden">
+                <div>
+                    What will you build?
+                </div>
+                <div>
+                    <ul>
+                        <li>Cabin</li>
+                        <li>Farm</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

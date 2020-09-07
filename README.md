@@ -14,6 +14,7 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [ ] comment my code
 - [ ] build up a more rich list of states and transitions
 - [ ] build up a more interesting list of missions
+- [ ] replace alerts with a popup that doesn't stop actions from processing
 
 
 - [ ] during a transition, overlay tile with a counting down pie graph
