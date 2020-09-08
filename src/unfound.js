@@ -1,195 +1,119 @@
-import { GameLoop, Sprite, init, initPointer, track, emit, on } from 'kontra';
+import { GameLoop, init, initPointer, track, on, emit } from 'kontra';
+import { BlockTile } from './tile';
+
+let tiles = new Map();
+let transitions = new Map();
+let activeWorkers = 0;
+let idleWorkers = 4;
+let stateToStore = [];
 
 init();
 initPointer();
 
-let url = window.location.href;
+on('askForChoice', askForChoice);
+on('choose', choose);
+on('transition', transition);
+on('endTransition', endTransition);
 
-if(url.indexOf('clear') != -1)
-    localStorage.clear();
+function localStorageSetup() {
+    const url = window.location.href;
+    let initialStates;
 
-let tileStates = getTileStates();
-
-class BlockTile extends Sprite.class {
-
-    takeState(state) {
-        let stateToTake = tileStates.get(state);
-        this.state = stateToTake.state;
-        this.fillStyle = stateToTake.fillStyle;
-        this.resource = stateToTake.resource;
-        this.ticksToRun = stateToTake.ticksToRun;
-        this.resourceChange = stateToTake.resourceChange;
-        this.nextState = stateToTake.nextState;
-        this.initialStyle = stateToTake.fillStyle;
-        this.transitionAction = stateToTake.transitionAction;
+    if(url.indexOf('clear') != -1)
+        localStorage.clear();
+    if(localStorage.getItem("unfound")) {
+        initialStates = JSON.parse(localStorage.getItem("unfound"));
     }
-
-    constructor(properties) {
-        super(properties);
-        this.strokeStyle = '1px black';
-        this.toUpdate = false;
-        this.transitionMessage = properties.transitionMessage;
-        this.takeState(properties.state);
+    else {
+        initialStates = [
+            {x: 0, y: 0, state: 'farm'},
+            {x: 0, y: 1, state: 'lw'},
+            {x: 0, y: 2, state: 'lw'},
+            {x: 0, y: 3, state: 'lw'},
+            {x: 0, y: 4, state: 'lw'},
+            {x: 0, y: 5, state: 'lw'},
+            {x: 0, y: 6, state: 'lw'},
+            {x: 0, y: 7, state: 'lw'},
+        ];
     }
-
-    render() {
-        switch (this.state) {
-            case 'lw':
-                this.context.beginPath();
-                this.context.fillStyle = 'brown';
-                this.context.fillRect(this.x+22, this.y+26, 6, 24);
-
-                this.context.beginPath();
-                this.context.fillStyle = 'green';
-                this.context.ellipse(this.x+25, this.y+20, 20, 13, 0,  0, 2*Math.PI);
-                this.context.fill();
-                break;
-            case 'cleared':
-                this.context.beginPath();
-                this.context.strokeStyle = this.strokeStyle;
-                this.context.fillStyle = 'white';
-                this.context.rect(this.x, this.y, this.width, this.height);
-                this.context.fill();
-                break;
-            case 'cabin':
-                this.context.beginPath();
-                this.context.strokeStyle = this.strokeStyle;
-                this.context.fillStyle = 'brown'
-                this.context.moveTo(this.x + this.width / 2, this.y + 1);
-                this.context.lineTo(this.x + this.width - 1, this.y + 20);
-                this.context.lineTo(this.x + 1, this.y + 20);
-                this.context.closePath();
-                this.context.stroke();
-  
-                this.context.beginPath();
-                this.context.moveTo(this.x + 5, this.y + this.height);
-                this.context.lineTo(this.x + 5, this.y + 20);
-                this.context.stroke();
-
-                this.context.beginPath();
-                this.context.moveTo(this.x + this.width - 5, 20);
-                this.context.lineTo(this.x +  + this.width - 5, this.height);
-                this.context.stroke();
-
-                this.context.beginPath();
-                this.context.moveTo(this.x + 1, this.y + this.height);
-                this.context.lineTo(this.x + this.width - 1, this.y + this.height);
-                this.context.stroke();
-
-                this.context.beginPath();
-                this.context.moveTo(this.x + 20, this.y + 50);
-                this.context.lineTo(this.x + 20, this.y + 30);
-                this.context.lineTo(this.x + 30, this.y + 30);
-                this.context.lineTo(this.x + 30, this.y + 50);
-                this.context.fill();
-                break;
-            default:
-                break;
-        }
+    
+    for(const tileDef of initialStates ) {
+        let tile = new BlockTile({
+            x: tileDef.x * 50,
+            y: tileDef.y * 50,
+            width: 50,
+            height: 50,
+            state: tileDef.state
+        });
+        track(tile);
+        tiles.set(`${tile.x},${tile.y}`, tile);
     }
+        
+}
 
-    update() {
-        if (this.toUpdate) {
-            this.ticksToRun = this.ticksToRun - 1;
-            this.transitionMessage = `1 worker ${this.transitionAction} for ${this.ticksToRun} s`;
-            if (this.ticksToRun === 0) {
-                let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
-                if (resourceCount)
-                    resourceCount = resourceCount + this.resourceChange;
-                else resourceCount = this.resourceChange;
-                window.localStorage.setItem(this.resource, `${resourceCount}`);
-                this.takeState(this.nextState);
-                this.toUpdate = false;
-                idleWorkers = idleWorkers + 1;
-                activeWorkers = activeWorkers - 1;
-                this.transitionMessage = null;
-            }
-            else {
-                let gradient = this.context.createLinearGradient(this.x, this.y, this.x + 50, this.y + 50);
-                gradient.addColorStop(0, this.initialStyle);
-                gradient.addColorStop(1, tileStates.get(this.nextState).fillStyle);
-                this.fillStyle = gradient;
-            }
-        }
-    }
-
-    onDown() {
-        if(this.nextState instanceof Array)
-            emit('choose', this.x, this.y);
-        else
-            emit('transition', this.x, this.y);
-        // // TODO handle the case where there are multiple transition choices
-        // if(this.nextState instanceof Array) {
-        //     document.getElementById('pick-build').style.visibility = '';
-        // }
+function askForChoice(x, y) {
+    // todo ask the player which transition to make
+    console.log(`choosing for ${x}, ${y}`);
+    const tile = tiles.get(`${x},${y}`);
+    // TODO handle the case where there are multiple transition choices
+    if(tile.nextState instanceof Array) {
+        const picker = document.getElementById('pick-build');
+        picker.style.visibility = '';
+        const choices = document.getElementById('choices');
+        tile.nextState.forEach(nextState => {
+            let choice = document.createElement('li');
+            choice.className = 'choice';
+            choice.textContent = nextState;
+            choice.onclick = emit('choose', x, y, nextState);
+            choices.appendChild(choice);
+        });
     }
 }
 
-on('choose', choose);
-on('transition', transition);
+function choose(x, y, state) {
+    // Hide the picker
+    document.getElementById('pick-build').style.visibility = 'hidden';
 
-function choose(x, y) {
-    console.log(`choosing for ${x}, ${y}`);
+    // make the transition
+    // first set the chosen state
     const tile = tiles.get(`${x},${y}`);
-    console.log(tile.nextState);
+    tile.nextState = state;
+    // then send the transition event
+    emit('transition', x, y);
 }
 
 function transition(x, y) {
     console.log(`transitioning ${x}, ${y}`);
-    const tile = tiles.get(`${x},${y}`);
-    console.log(tile);
-    if(tile.toUpdate) {
+    const transition = transitions.get(`${x},${y}`);
+    console.log(transition);
+    if(transition) {
         alert('action already in process');
     }
     else if(idleWorkers > 0) {
+        const tile = tiles.get(`${x},${y}`);
         let resourceCount = Number.parseInt(window.localStorage.getItem(tile.resource), 10);
-        if (resourceCount && (resourceCount + tile.resourceChange) >= 0) {
+
+        if (!resourceCount || //This is our first transition and localStorage is empty
+            (resourceCount && // There are some resources, so we check if we have enough
+                (resourceCount + tile.resourceChange) >= 0)) {
+            
             activeWorkers = activeWorkers + 1;
             idleWorkers = idleWorkers - 1;
             tile.toUpdate = true;
-        }
-        else if (!resourceCount) {
-            activeWorkers = activeWorkers + 1;
-            idleWorkers = idleWorkers - 1;
-            tile.toUpdate = true;
+            transitions.set(`${x},${y}`,tile.nextState);
         }
         else alert('insufficient resources');
     }
     else alert('no available workers');
 }
 
-let tiles = new Map();
-let activeWorkers = 0;
-let idleWorkers = 4;
-let initialStates;
-if(localStorage.getItem("unfound")) {
-    initialStates = JSON.parse(localStorage.getItem("unfound"));
-}
-else {
-    initialStates = [
-        {x: 0, y: 0, state: 'lw'},
-        {x: 0, y: 1, state: 'lw'},
-        {x: 0, y: 2, state: 'lw'},
-        {x: 0, y: 3, state: 'lw'},
-        {x: 0, y: 4, state: 'lw'},
-        {x: 0, y: 5, state: 'lw'},
-        {x: 0, y: 6, state: 'lw'},
-        {x: 0, y: 7, state: 'lw'},
-    ];
+function endTransition(x, y) {
+    console.log(`finishing transition ${x}, ${y}`);
+    transitions.delete(`${x},${y}`);
+    idleWorkers = idleWorkers + 1;
+    activeWorkers = activeWorkers - 1;
 }
 
-for(const tileDef of initialStates ) {
-    let tile = new BlockTile({
-        x: tileDef.x * 50,
-        y: tileDef.y * 50,
-        width: 50,
-        height: 50,
-        state: tileDef.state
-    });
-    track(tile);
-    tiles.set(`${tile.x},${tile.y}`, tile);
-}
-let stateToStore = [];
 let loop = GameLoop({
     fps: 1,
     update: function () {
@@ -218,31 +142,6 @@ let loop = GameLoop({
     }
 });
 
+localStorageSetup();
+
 loop.start();
-
-function getTileStates() {
-    let tileStates = new Map();
-
-    tileStates.set('lw', {
-        fillStyle: '#3A8C63',
-        resource: 'lumber',
-        ticksToRun: 10,
-        resourceChange: 3,
-        nextState: 'cleared',
-        transitionAction: 'clearing wood',
-        state: 'lw'
-    });
-    tileStates.set('cleared', {
-        fillStyle: '#1CF689',
-        resource: 'lumber',
-        ticksToRun: [10, 20],
-        resourceChange: [-5, -10],
-        nextState: ['cabin','farm'],
-        state: 'cleared'
-    });
-    tileStates.set('cabin', {
-        fillStyle: 'brown',
-        state: 'cabin'
-    });
-    return tileStates;
-}
