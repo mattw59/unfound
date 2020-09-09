@@ -64,7 +64,9 @@ function askForChoice(x, y) {
             let choice = document.createElement('li');
             choice.className = 'choice';
             choice.textContent = nextState;
-            choice.onclick = emit('choose', x, y, nextState);
+            choice.onclick = function() {
+                emit('choose', x, y, nextState);
+            };
             choices.appendChild(choice);
         });
     }

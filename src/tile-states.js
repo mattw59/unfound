@@ -12,8 +12,8 @@ tileStates.set('lw', {
 tileStates.set('cleared', {
     fillStyle: '#1CF689',
     resource: 'lumber',
-    ticksToRun: [10, 20],
-    resourceChange: [-5, -10],
+    ticksToRun: 10,
+    resourceChange: -5, 
     nextState: ['cabin','farm'],
     state: 'cleared'
 });
@@ -23,5 +23,19 @@ tileStates.set('cabin', {
 });
 tileStates.set('farm', {
     fillStyle: 'yellow',
-    state: 'farm'
+    resource: 'food',
+    ticksToRun: 30,
+    resourceChange: 0,
+    nextState: 'harvest',
+    transitionAction: 'farming',
+    state: 'farm' 
+});
+tileStates.set('harvest', {
+    fillStyle: 'orange',
+    state: 'harvest',
+    resource: 'food',
+    ticksToRun: 3,
+    resourceChange: 20,
+    nextState: 'farm',
+    state: 'harvest'
 });
