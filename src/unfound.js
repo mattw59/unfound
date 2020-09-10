@@ -17,19 +17,19 @@ on('choose', choose);
 on('transition', transition);
 on('endTransition', endTransition);
 
-function localStorageSetup() {
+function initLocalStorage() {
     const url = window.location.href;
     let initialStates;
 
     if(url.indexOf('clear') != -1) {
         localStorage.clear();
     }
-    if(!localStorage.getItem("lumber"))
-        localStorage.setItem("lumber", 0);
-    if(!localStorage.getItem("food"))
-        localStorage.setItem("food", 0);
-    if(!localStorage.getItem("coin"))
-        localStorage.setItem("coin", 0);
+    if(!localStorage.getItem("unfound.lumber"))
+        localStorage.setItem("unfound.lumber", 0);
+    if(!localStorage.getItem("unfound.food"))
+        localStorage.setItem("unfound.food", 0);
+    if(!localStorage.getItem("unfoundcoin"))
+        localStorage.setItem("unfound.coin", 0);
 
     if(localStorage.getItem("unfound.missions"))
         missions = JSON.parse(localStorage.getItem("unfound.missions"));
@@ -44,7 +44,7 @@ function localStorageSetup() {
     }
     else {
         initialStates = [
-            {x: 0, y: 0, state: 'farm'},
+            {x: 0, y: 0, state: 'lw'},
             {x: 0, y: 1, state: 'lw'},
             {x: 0, y: 2, state: 'lw'},
             {x: 0, y: 3, state: 'lw'},
@@ -52,6 +52,42 @@ function localStorageSetup() {
             {x: 0, y: 5, state: 'lw'},
             {x: 0, y: 6, state: 'lw'},
             {x: 0, y: 7, state: 'lw'},
+            {x: 1, y: 0, state: 'lw'},
+            {x: 1, y: 1, state: 'lw'},
+            {x: 1, y: 2, state: 'lw'},
+            {x: 1, y: 3, state: 'lw'},
+            {x: 1, y: 4, state: 'lw'},
+            {x: 1, y: 5, state: 'lw'},
+            {x: 1, y: 6, state: 'lw'},
+            {x: 1, y: 7, state: 'lw'},
+            {x: 2, y: 0, state: 'lw'},
+            {x: 2, y: 1, state: 'lw'},
+            {x: 2, y: 2, state: 'lw'},
+            {x: 2, y: 3, state: 'lw'},
+            {x: 2, y: 4, state: 'lw'},
+            {x: 2, y: 5, state: 'lw'},
+            {x: 2, y: 6, state: 'lw'},
+            {x: 2, y: 7, state: 'lw'},
+            {x: 3, y: 0, state: 'clear'},
+            {x: 3, y: 1, state: 'lw'},
+            {x: 3, y: 2, state: 'lw'},
+            {x: 3, y: 3, state: 'lw'},
+            {x: 3, y: 4, state: 'lw'},
+            {x: 3, y: 5, state: 'lw'},
+            {x: 3, y: 6, state: 'lw'},
+            {x: 3, y: 7, state: 'lw'},
+            {x: 4, y: 0, state: 'water'},
+            {x: 5, y: 0, state: 'water'},
+            {x: 6, y: 0, state: 'water'},
+            {x: 7, y: 0, state: 'lw'},
+            {x: 8, y: 0, state: 'lw'},
+            {x: 9, y: 0, state: 'lw'},
+            {x: 10, y: 0, state: 'lw'},
+            {x: 11, y: 0, state: 'lw'},
+            {x: 12, y: 0, state: 'lw'},
+            {x: 13, y: 0, state: 'lw'},
+
+
         ];
     }
     
@@ -113,7 +149,7 @@ function transition(x, y) {
     }
     else if(idleWorkers > 0) {
         const tile = tiles.get(`${x},${y}`);
-        let resourceCount = Number.parseInt(window.localStorage.getItem(tile.resource), 10);
+        let resourceCount = Number.parseInt(window.localStorage.getItem(`unfound.${tile.resource}`), 10);
 
         if (!resourceCount || //This is our first transition and localStorage is empty
             (resourceCount && // There are some resources, so we check if we have enough
@@ -161,7 +197,7 @@ let loop = GameLoop({
             stateToStore.push({x: tile.x / 50, y: tile.y / 50, state: tile.state});
         });
         missions.forEach(mission => {
-            let actualResource = Number.parseInt(window.localStorage.getItem(mission.resource), 10);
+            let actualResource = Number.parseInt(window.localStorage.getItem(`unfound.${mission.resource}`), 10);
             if(actualResource < mission.count) {
                 let missionElement = document.createElement('li'); 
                 missionElement.className = 'missionMessage';
@@ -184,9 +220,9 @@ let loop = GameLoop({
         useFood();
     },
     render: function () {
-        document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
-        document.getElementById('food').innerHTML = localStorage.getItem('food');
-        document.getElementById('coin').innerHTML = localStorage.getItem('coin');
+        document.getElementById('lumber').innerHTML = localStorage.getItem('unfound.lumber');
+        document.getElementById('food').innerHTML = localStorage.getItem('unfound.food');
+        document.getElementById('coin').innerHTML = localStorage.getItem('unfound.coin');
         document.getElementById('idle').innerHTML = idleWorkers;
 
         tiles.forEach(tile => tile.render());
@@ -205,7 +241,7 @@ function updateWorkerCount() {
     const cabinCount = tilesArray.reduce(reducer, 0);
 
     // get the current amount of food on hand
-    let food = Number.parseInt(window.localStorage.getItem('food'), 10);
+    let food = Number.parseInt(window.localStorage.getItem('unfound.food'), 10);
 
     // Workers are attracted to your settlment when there is sufficient housing
     // each cabin houses 4 workers
@@ -216,11 +252,11 @@ function updateWorkerCount() {
 }
 
 function useFood() {
-    let food = Number.parseInt(window.localStorage.getItem('food'), 10);
+    let food = Number.parseInt(window.localStorage.getItem('unfound.food'), 10);
     food = Math.max(0, food - 1);
-    localStorage.setItem('food', food);
+    localStorage.setItem('unfound.food', food);
 }
 
-localStorageSetup();
+initLocalStorage();
 
 loop.start();

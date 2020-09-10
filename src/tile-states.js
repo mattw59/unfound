@@ -37,6 +37,9 @@ tileStates.set('harvest', {
     ticksToRun: 3,
     resourceChange: 40,
     nextState: 'farm',
-    transitionAction: 'harvesting food',
-    state: 'harvest'
+    transitionAction: 'harvesting food'
+});
+tileStates.set('water', {
+    fillStyle: 'blue',
+    state: 'water',
 });

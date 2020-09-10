@@ -13,6 +13,7 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [ ] replace alerts with a popup that doesn't stop actions from processing
 - [ ] namespace all my variables in localstorage
 - [ ] icons for each state type
+- [ ] create more complete map
 
 - [ ] during a transition, overlay tile with a counting down pie graph
 - [ ] add the ability to pan left/right/up/down

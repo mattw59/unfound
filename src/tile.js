@@ -85,11 +85,11 @@ export class BlockTile extends Sprite.class {
             this.ticksToRun = this.ticksToRun - 1;
             this.transitionMessage = `1 worker ${this.transitionAction} for ${this.ticksToRun} s`;
             if (this.ticksToRun === 0) {
-                let resourceCount = Number.parseInt(window.localStorage.getItem(this.resource), 10);
+                let resourceCount = Number.parseInt(window.localStorage.getItem(`unfound.${this.resource}`), 10);
                 if (resourceCount)
                     resourceCount = resourceCount + this.resourceChange;
                 else resourceCount = this.resourceChange;
-                window.localStorage.setItem(this.resource, `${resourceCount}`);
+                window.localStorage.setItem(`unfound.${this.resource}`, `${resourceCount}`);
                 this.takeState(this.nextState);
                 this.toUpdate = false;
                 this.transitionMessage = null;
