@@ -6,15 +6,13 @@ I'm using the README to act as a simplified backlog. This allows me to try out s
 
 In a larger scale codebase, I most likely would document work to be done using other means, such as Gherkin feature files or test code. In this codebase, I'm adding to the Github-flavored Markdown list below as I think of things, and marking them as complete when they are done.
 
-- [ ] include a missions list in a left-side menu
-- [ ] new workers are added when food or housing is available
-- [ ] farms generate resources over time
-- [ ] farms occupy a worker
+- [ ] add mission types beyond resource gathering: build a cabin; have 10 workers, etc
 - [ ] comment my code
 - [ ] build up a more rich list of states and transitions
 - [ ] build up a more interesting list of missions
 - [ ] replace alerts with a popup that doesn't stop actions from processing
-
+- [ ] namespace all my variables in localstorage
+- [ ] icons for each state type
 
 - [ ] during a transition, overlay tile with a counting down pie graph
 - [ ] add the ability to pan left/right/up/down
@@ -23,6 +21,11 @@ In a larger scale codebase, I most likely would document work to be done using o
 - [ ] queue up actions
 - [ ] allow queued actions to be canceled
 
+- [X] new workers are added when food or housing is available
+- [X] use food over time 
+- [X] farms generate resources over time
+- [X] farms occupy a worker
+- [X] include a missions list in a left-side menu
 - [X] display a stats summary across the top of the screen
 - [X] limit the number of active transitions by the number of workers
 - [X] Define the game's beginning state in a JSON array, which is copied into local storage on first load

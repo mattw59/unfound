@@ -1,8 +1,10 @@
 import { GameLoop, init, initPointer, track, on, emit } from 'kontra';
 import { BlockTile } from './tile';
+import { missionsTable } from './missions.js';
 
 let tiles = new Map();
 let transitions = new Map();
+let missions = [];
 let activeWorkers = 0;
 let idleWorkers = 4;
 let stateToStore = [];
@@ -19,8 +21,24 @@ function localStorageSetup() {
     const url = window.location.href;
     let initialStates;
 
-    if(url.indexOf('clear') != -1)
+    if(url.indexOf('clear') != -1) {
         localStorage.clear();
+    }
+    if(!localStorage.getItem("lumber"))
+        localStorage.setItem("lumber", 0);
+    if(!localStorage.getItem("food"))
+        localStorage.setItem("food", 0);
+    if(!localStorage.getItem("coin"))
+        localStorage.setItem("coin", 0);
+
+    if(localStorage.getItem("unfound.missions"))
+        missions = JSON.parse(localStorage.getItem("unfound.missions"));
+    else
+        missions.push(missionsTable.shift());
+
+    if(localStorage.getItem("unfound.missionsTable"))
+        missionsTable = JSON.parse(localStorage.getItem("unfound.missionsTable"));
+    
     if(localStorage.getItem("unfound")) {
         initialStates = JSON.parse(localStorage.getItem("unfound"));
     }
@@ -52,10 +70,13 @@ function localStorageSetup() {
 }
 
 function askForChoice(x, y) {
-    // todo ask the player which transition to make
-    console.log(`choosing for ${x}, ${y}`);
     const tile = tiles.get(`${x},${y}`);
-    // TODO handle the case where there are multiple transition choices
+
+    let pickerChoices = document.getElementsByClassName('choice');
+    while(pickerChoices.length > 0) {
+        let choice = pickerChoices.item(pickerChoices.length - 1);
+        choice.remove();
+    }
     if(tile.nextState instanceof Array) {
         const picker = document.getElementById('pick-build');
         picker.style.visibility = '';
@@ -80,14 +101,13 @@ function choose(x, y, state) {
     // first set the chosen state
     const tile = tiles.get(`${x},${y}`);
     tile.nextState = state;
+    tile.transitionAction = `builing ${state}`;
     // then send the transition event
     emit('transition', x, y);
 }
 
 function transition(x, y) {
-    console.log(`transitioning ${x}, ${y}`);
     const transition = transitions.get(`${x},${y}`);
-    console.log(transition);
     if(transition) {
         alert('action already in process');
     }
@@ -110,7 +130,6 @@ function transition(x, y) {
 }
 
 function endTransition(x, y) {
-    console.log(`finishing transition ${x}, ${y}`);
     transitions.delete(`${x},${y}`);
     idleWorkers = idleWorkers + 1;
     activeWorkers = activeWorkers - 1;
@@ -119,10 +138,17 @@ function endTransition(x, y) {
 let loop = GameLoop({
     fps: 1,
     update: function () {
+        const statusesElement = document.getElementById('statuses');
         stateToStore = [];
         const messages = document.getElementsByClassName('transitionMessage');
-        for (const message of messages) {
-            message.remove();
+        while(messages.length > 0) {
+            let message = messages.item(messages.length - 1);
+            message.remove();   
+        }
+        const missionMessages = document.getElementsByClassName('missionMessage');
+        while(missionMessages.length > 0) {
+            let message = missionMessages.item(missionMessages.length - 1);
+            message.remove();   
         }
         tiles.forEach(tile => {
             tile.update();
@@ -130,19 +156,70 @@ let loop = GameLoop({
                 let status = document.createElement('li');
                 status.className = 'transitionMessage';
                 status.textContent = tile.transitionMessage;
-                statuses.appendChild(status);
+                statusesElement.appendChild(status);
             }
             stateToStore.push({x: tile.x / 50, y: tile.y / 50, state: tile.state});
-        })
+        });
+        missions.forEach(mission => {
+            let actualResource = Number.parseInt(window.localStorage.getItem(mission.resource), 10);
+            if(actualResource < mission.count) {
+                let missionElement = document.createElement('li'); 
+                missionElement.className = 'missionMessage';
+                missionElement.textContent = mission.message;
+                statuses.appendChild(missionElement);
+            }
+            else {
+                missions.shift();
+                if(missionsTable.length > 0)
+                    missions.push(missionsTable.shift());
+            }
+        });
+
+        // TODO fix this; the missions data isn't being stored correctly
+        localStorage.setItem("unfound.missions", missions);
+        localStorage.setItem("unfound.missionsTable", missionsTable);
         localStorage.setItem("unfound",JSON.stringify(stateToStore));
+
+        updateWorkerCount();
+        useFood();
     },
     render: function () {
         document.getElementById('lumber').innerHTML = localStorage.getItem('lumber');
+        document.getElementById('food').innerHTML = localStorage.getItem('food');
+        document.getElementById('coin').innerHTML = localStorage.getItem('coin');
         document.getElementById('idle').innerHTML = idleWorkers;
 
         tiles.forEach(tile => tile.render());
     }
 });
+
+function updateWorkerCount() {
+    // Count the cabins
+    const tilesArray = Array.from(tiles.values());
+
+    let reducer = (acc, cur) => {
+        if(cur.state === 'cabin')
+            acc = acc + 1;
+            return acc;
+    }
+    const cabinCount = tilesArray.reduce(reducer, 0);
+
+    // get the current amount of food on hand
+    let food = Number.parseInt(window.localStorage.getItem('food'), 10);
+
+    // Workers are attracted to your settlment when there is sufficient housing
+    // each cabin houses 4 workers
+    // 
+
+    let foodCanFeed = Math.floor(food / 10);
+    idleWorkers = Math.max(4, Math.min(cabinCount * 4, foodCanFeed)) - activeWorkers;
+}
+
+function useFood() {
+    let food = Number.parseInt(window.localStorage.getItem('food'), 10);
+    food = Math.max(0, food - 1);
+    localStorage.setItem('food', food);
+}
 
 localStorageSetup();
 

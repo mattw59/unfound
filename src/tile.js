@@ -57,8 +57,8 @@ export class BlockTile extends Sprite.class {
                 this.context.stroke();
 
                 this.context.beginPath();
-                this.context.moveTo(this.x + this.width - 5, 20);
-                this.context.lineTo(this.x +  + this.width - 5, this.height);
+                this.context.moveTo(this.x + this.width - 5, this.y + 20);
+                this.context.lineTo(this.x + this.width - 5, this.y + this.height);
                 this.context.stroke();
 
                 this.context.beginPath();
@@ -73,11 +73,9 @@ export class BlockTile extends Sprite.class {
                 this.context.lineTo(this.x + 30, this.y + 50);
                 this.context.fill();
                 break;
-            case 'farm':
+            default:
                 this.context.fillStyle = this.fillStyle;
                 this.context.fillRect(this.x, this.y, this.width, this.height);
-                break;
-            default:
                 break;
         }
     }
