@@ -1,0 +1,23 @@
+refactoring:
+    ☐ introduce TypeScript
+    ☐ introduce a model class for game-wide state
+    ☐ replace Kontra.js with pure JS/TS implementation
+    ☐ write test scripts around the models, events, timing, etc. strip off the UI
+    ☐ comment my code
+
+framework-free:
+    ☐ devise a test case to minimize the number of frameworks beyond TypeScript and WebPack
+
+features:
+    ☐ add mission types beyond resource gathering: build a cabin; have 10 workers, etc
+    ☐ build up a more rich list of states and transitions
+    ☐ build up a more interesting list of missions
+    ☐ replace alerts with a popup that doesn't stop actions from processing
+    ☐ icons for each state type
+    ☐ create more complete map
+    ☐ during a transition, overlay tile with a counting down pie graph
+    ☐ add the ability to pan left/right/up/down
+    ☐ add the ability to zoom in and out
+    ☐ if not zoom a minimap
+    ☐ queue up actions
+    ☐ allow queued actions to be canceled
