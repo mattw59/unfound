@@ -1,13 +1,15 @@
-export let missionsTable = [];
-
-missionsTable.push({
-    message: 'collect 10 lumber',
-    resource: 'lumber',
-    count: 10
-});
-
-missionsTable.push({
-    message: 'collect 3 lumber',
-    resource: 'lumber',
-    count: 3
-});
+export let missions = [
+    {
+        message: 'collect 10 lumber',
+        resource: 'lumber',
+        count: 10
+    },
+    {
+        message: 'collect 50 food',
+        resource: 'food',
+        count: 50
+    },
+    {
+        message: 'YOU WIN'
+    }
+];

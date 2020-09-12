@@ -1,13 +1,13 @@
 import { GameLoop, init, initPointer, track, on, emit } from 'kontra';
 import { BlockTile } from './tile';
-import { missionsTable } from './missions.js';
+import { missions } from './missions.js';
 
 let tiles = new Map();
 let transitions = new Map();
-let missions = [];
 let activeWorkers = 0;
 let idleWorkers = 4;
 let stateToStore = [];
+let activeMission = 0;
 
 init();
 initPointer();
@@ -28,17 +28,10 @@ function initLocalStorage() {
         localStorage.setItem("unfound.lumber", 0);
     if(!localStorage.getItem("unfound.food"))
         localStorage.setItem("unfound.food", 0);
-    if(!localStorage.getItem("unfoundcoin"))
+    if(!localStorage.getItem("unfound.coin"))
         localStorage.setItem("unfound.coin", 0);
-
-    if(localStorage.getItem("unfound.missions"))
-        missions = JSON.parse(localStorage.getItem("unfound.missions"));
-    else
-        missions.push(missionsTable.shift());
-
-    if(localStorage.getItem("unfound.missionsTable"))
-        missionsTable = JSON.parse(localStorage.getItem("unfound.missionsTable"));
-    
+    if(!localStorage.getItem("unfound.activeMission"))
+        localStorage.setItem("unfound.activeMission", activeMission);
     if(localStorage.getItem("unfound")) {
         initialStates = JSON.parse(localStorage.getItem("unfound"));
     }
@@ -68,7 +61,7 @@ function initLocalStorage() {
             {x: 2, y: 5, state: 'lw'},
             {x: 2, y: 6, state: 'lw'},
             {x: 2, y: 7, state: 'lw'},
-            {x: 3, y: 0, state: 'cleared'},
+            {x: 3, y: 0, state: 'lw'},
             {x: 3, y: 1, state: 'lw'},
             {x: 3, y: 2, state: 'lw'},
             {x: 3, y: 3, state: 'lw'},
@@ -76,24 +69,78 @@ function initLocalStorage() {
             {x: 3, y: 5, state: 'lw'},
             {x: 3, y: 6, state: 'lw'},
             {x: 3, y: 7, state: 'lw'},
-            {x: 4, y: 0, state: 'water'},
-            {x: 4, y: 1, state: 'cleared'},
-            {x: 4, y: 2, state: 'cleared'},
+            {x: 4, y: 0, state: 'farm'},
+            {x: 4, y: 1, state: 'harvest'},
+            {x: 4, y: 2, state: 'barn'},
+            {x: 4, y: 3, state: 'lw'},
+            {x: 4, y: 4, state: 'lw'},
+            {x: 4, y: 5, state: 'lw'},
+            {x: 4, y: 6, state: 'lw'},
+            {x: 4, y: 7, state: 'lw'},
             {x: 5, y: 0, state: 'water'},
-            {x: 5, y: 1, state: 'water'},
-            {x: 5, y: 2, state: 'water'},
+            {x: 5, y: 1, state: 'cleared'},
+            {x: 5, y: 2, state: 'lw'},
+            {x: 5, y: 3, state: 'lw'},
+            {x: 5, y: 4, state: 'lw'},
+            {x: 5, y: 5, state: 'lw'},
+            {x: 5, y: 6, state: 'lw'},
+            {x: 5, y: 7, state: 'lw'},
             {x: 6, y: 0, state: 'water'},
             {x: 6, y: 1, state: 'water'},
             {x: 6, y: 2, state: 'water'},
-            {x: 7, y: 0, state: 'cleared'},
-            {x: 8, y: 0, state: 'lw'},
+            {x: 6, y: 3, state: 'water'},
+            {x: 6, y: 4, state: 'water'},
+            {x: 6, y: 5, state: 'water'},
+            {x: 6, y: 6, state: 'water'},
+            {x: 6, y: 7, state: 'water'},
+            {x: 7, y: 0, state: 'water'},
+            {x: 7, y: 1, state: 'cleared'},
+            {x: 7, y: 2, state: 'lw'},
+            {x: 7, y: 3, state: 'lw'},
+            {x: 7, y: 4, state: 'lw'},
+            {x: 7, y: 5, state: 'lw'},
+            {x: 7, y: 6, state: 'lw'},
+            {x: 7, y: 7, state: 'lw'},
+            {x: 8, y: 0, state: 'cleared'},
+            {x: 8, y: 1, state: 'cleared'},
+            {x: 8, y: 2, state: 'lw'},
+            {x: 8, y: 3, state: 'lw'},
+            {x: 8, y: 4, state: 'lw'},
+            {x: 8, y: 5, state: 'lw'},
+            {x: 8, y: 6, state: 'lw'},
+            {x: 8, y: 7, state: 'lw'},
             {x: 9, y: 0, state: 'lw'},
+            {x: 9, y: 1, state: 'lw'},
+            {x: 9, y: 2, state: 'lw'},
+            {x: 9, y: 3, state: 'lw'},
+            {x: 9, y: 4, state: 'lw'},
+            {x: 9, y: 5, state: 'lw'},
+            {x: 9, y: 6, state: 'lw'},
+            {x: 9, y: 7, state: 'lw'},
             {x: 10, y: 0, state: 'lw'},
+            {x: 10, y: 1, state: 'lw'},
+            {x: 10, y: 2, state: 'lw'},
+            {x: 10, y: 3, state: 'lw'},
+            {x: 10, y: 4, state: 'lw'},
+            {x: 10, y: 5, state: 'lw'},
+            {x: 10, y: 6, state: 'lw'},
+            {x: 10, y: 7, state: 'lw'},
             {x: 11, y: 0, state: 'lw'},
+            {x: 11, y: 1, state: 'lw'},
+            {x: 11, y: 2, state: 'lw'},
+            {x: 11, y: 3, state: 'lw'},
+            {x: 11, y: 4, state: 'lw'},
+            {x: 11, y: 5, state: 'lw'},
+            {x: 11, y: 6, state: 'lw'},
+            {x: 11, y: 7, state: 'lw'},
             {x: 12, y: 0, state: 'lw'},
-            {x: 13, y: 0, state: 'lw'},
-
-
+            {x: 12, y: 1, state: 'lw'},
+            {x: 12, y: 2, state: 'lw'},
+            {x: 12, y: 3, state: 'lw'},
+            {x: 12, y: 4, state: 'lw'},
+            {x: 12, y: 5, state: 'lw'},
+            {x: 12, y: 6, state: 'lw'},
+            {x: 12, y: 7, state: 'lw'},
         ];
     }
     
@@ -157,10 +204,18 @@ function transition(x, y) {
         const tile = tiles.get(`${x},${y}`);
         let resourceCount = Number.parseInt(window.localStorage.getItem(`unfound.${tile.resource}`), 10);
 
-        if (!resourceCount || //This is our first transition and localStorage is empty
+        if ((!resourceCount && tile.resourceChange > 0) || //This is our first transition and localStorage is empty, so we only allow gathering
             (resourceCount && // There are some resources, so we check if we have enough
                 (resourceCount + tile.resourceChange) >= 0)) {
-            
+
+            // spend resources now, gather later
+            if (tile.resourceChange < 0) {
+                if(resourceCount)
+                    resourceCount = resourceCount + tile.resourceChange;
+                else resourceCount = tile.resourceChange;
+                window.localStorage.setItem(`unfound.${tile.resource}`, `${resourceCount}`);
+
+            }
             activeWorkers = activeWorkers + 1;
             idleWorkers = idleWorkers - 1;
             tile.toUpdate = true;
@@ -202,7 +257,9 @@ let loop = GameLoop({
             }
             stateToStore.push({x: tile.x / 50, y: tile.y / 50, state: tile.state});
         });
-        missions.forEach(mission => {
+
+        let mission = missions[activeMission];
+        if(mission) {
             let actualResource = Number.parseInt(window.localStorage.getItem(`unfound.${mission.resource}`), 10);
             if(actualResource < mission.count) {
                 let missionElement = document.createElement('li'); 
@@ -211,15 +268,15 @@ let loop = GameLoop({
                 statuses.appendChild(missionElement);
             }
             else {
-                missions.shift();
-                if(missionsTable.length > 0)
-                    missions.push(missionsTable.shift());
+                activeMission = activeMission + 1;
             }
-        });
-
-        // TODO fix this; the missions data isn't being stored correctly
-        localStorage.setItem("unfound.missions", missions);
-        localStorage.setItem("unfound.missionsTable", missionsTable);
+        }
+        else {
+            let restart = confirm('YOU WIN! Play again?')
+            if(restart)
+                location.assign(location.href+"?clear");
+        }
+        localStorage.setItem("unfound.activeMission", activeMission);
         localStorage.setItem("unfound",JSON.stringify(stateToStore));
 
         updateWorkerCount();
@@ -230,6 +287,7 @@ let loop = GameLoop({
         document.getElementById('food').innerHTML = localStorage.getItem('unfound.food');
         document.getElementById('coin').innerHTML = localStorage.getItem('unfound.coin');
         document.getElementById('idle').innerHTML = idleWorkers;
+        document.getElementById('residents').innerHTML = (activeWorkers + idleWorkers);
 
         tiles.forEach(tile => tile.render());
     }
