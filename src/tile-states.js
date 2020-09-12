@@ -14,7 +14,7 @@ tileStates.set('cleared', {
     resource: 'lumber',
     ticksToRun: 10,
     resourceChange: -5, 
-    nextState: ['cabin','farm'],
+    nextState: ['cabin','farm','barn'],
     state: 'cleared'
 });
 tileStates.set('cabin', {
@@ -33,7 +33,7 @@ tileStates.set('harvest', {
     state: 'harvest',
     resource: 'food',
     ticksToRun: 3,
-    resourceChange: 40,
+    resourceChange: 150,
     nextState: 'farm',
     transitionAction: 'harvesting food'
 });
