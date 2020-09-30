@@ -16,6 +16,7 @@
     "webpack-cli": "^3.3.12"
   },
   "devDependencies": {
-    "compression-webpack-plugin": "^5.0.1"
+    "compression-webpack-plugin": "^5.0.1",
+    "typescript": "^4.0.3"
   }
 }

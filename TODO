@@ -1,5 +1,5 @@
 refactoring:
-    ☐ introduce TypeScript
+    ✔ introduce TypeScript @done(20-09-30 22:34)
     ☐ introduce a model class for game-wide state
     ☐ replace Kontra.js with pure JS/TS implementation
     ☐ write test scripts around the models, events, timing, etc. strip off the UI
@@ -9,6 +9,8 @@ framework-free:
     ☐ devise a test case to minimize the number of frameworks beyond TypeScript and WebPack
 
 features:
+    ☐ hexagons!
+    ☐ tower defense??
     ☐ add mission types beyond resource gathering: build a cabin; have 10 workers, etc
     ☐ build up a more rich list of states and transitions
     ☐ build up a more interesting list of missions
